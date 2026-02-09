@@ -295,7 +295,7 @@ Or for larger sections:
 
 ```markdown
 > **⚠️ OUTDATED**: This section describes the old implementation.
-> See [New Auth Flow](./NEW-AUTH.md) for current approach.
+> See [New Feature Name](./path/to/new-doc.md) for current approach.
 ```
 
 ### Deleting Documentation
