@@ -21,7 +21,8 @@ This guide will help you get up to speed on the Try on Haul codebase. Whether yo
 |-------|------------|
 | Frontend | Next.js 16 (App Router, React 19) |
 | Styling | Tailwind CSS |
-| Auth | Clerk (social OAuth) |
+| Auth | NextAuth.js (Auth.js v5) |
+| Auth Database | Vercel Postgres |
 | Background Jobs | Inngest |
 | AI Generation | fal.ai (CatVTON) + FASHN (backup) |
 | Storage | Vercel Blob (ephemeral), Vercel KV |
@@ -37,8 +38,8 @@ This guide will help you get up to speed on the Try on Haul codebase. Whether yo
 - Node.js 20+
 - pnpm (preferred) or npm
 - Git
-- Vercel account (for local Blob/KV emulation)
-- Clerk account (for auth testing)
+- Vercel account (for local Blob/KV/Postgres emulation)
+- OAuth app credentials (Facebook, TikTok, Instagram, Apple)
 
 ### Initial Setup
 
@@ -62,9 +63,24 @@ pnpm dev
 ```bash
 # .env.local
 
-# Clerk (Auth)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
-CLERK_SECRET_KEY=sk_test_xxx
+# NextAuth.js
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=xxx  # Generate with: openssl rand -base64 32
+
+# OAuth Providers
+FACEBOOK_CLIENT_ID=xxx
+FACEBOOK_CLIENT_SECRET=xxx
+TIKTOK_CLIENT_KEY=xxx
+TIKTOK_CLIENT_SECRET=xxx
+INSTAGRAM_CLIENT_ID=xxx
+INSTAGRAM_CLIENT_SECRET=xxx
+APPLE_ID=xxx
+APPLE_SECRET=xxx
+
+# Database (Vercel Postgres)
+POSTGRES_URL=xxx
+POSTGRES_PRISMA_URL=xxx
+POSTGRES_URL_NON_POOLING=xxx
 
 # Vercel Storage
 BLOB_READ_WRITE_TOKEN=xxx
@@ -100,7 +116,7 @@ tryonhaul/
 │   └── layouts/          # Layout components
 ├── lib/                   # Shared utilities
 │   ├── ai/               # AI provider adapters
-│   ├── auth/             # Clerk helpers
+│   ├── auth/             # NextAuth.js config + helpers
 │   ├── storage/          # Blob/KV helpers
 │   └── utils/            # General utilities
 ├── inngest/              # Background job functions
@@ -385,7 +401,7 @@ npx inngest-cli dev
 
 - **Architecture questions**: Check docs or ask in #engineering
 - **AI provider issues**: See [AI-MODELS.md](../docs/research/AI-MODELS.md)
-- **Auth issues**: Clerk docs + internal wiki
+- **Auth issues**: See [AUTH-COMPARISON.md](../docs/research/AUTH-COMPARISON.md) + NextAuth.js docs
 - **Stuck?**: Ask in Slack, open a GitHub issue
 
 ---

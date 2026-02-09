@@ -17,13 +17,13 @@ This document captures all technology decisions for Try on Haul with rationale a
 |----------|----------|------------------------|
 | Frontend | Next.js 16 (App Router) | SvelteKit, Remix |
 | PWA | @serwist/next | next-pwa (abandoned) |
-| Authentication | Clerk | NextAuth, Auth0, Supabase |
-| Background Jobs | Inngest | Trigger.dev, Upstash QStash |
+| Authentication | NextAuth.js (Auth.js v5) | Clerk, Supabase Auth, Firebase |
+| Background Jobs | Inngest | Trigger.dev, BullMQ, pg-boss |
 | AI Generation | CatVTON via fal.ai | IDM-VTON, FASHN API |
 | Hosting | Vercel | Netlify, Cloudflare |
 | Image Processing | next/image + Sharp | Cloudinary, Imgix |
 | Analytics | Plausible | PostHog, Google Analytics |
-| Database | Vercel KV (minimal) | Supabase, PlanetScale |
+| Database | Vercel Postgres | Supabase, PlanetScale |
 
 ---
 
@@ -72,35 +72,52 @@ This document captures all technology decisions for Try on Haul with rationale a
 
 ## 3. Authentication
 
-### Decision: Clerk
+### Decision: NextAuth.js (Auth.js v5)
 
-**Why Clerk:**
-- Pre-configured OAuth for development (zero setup)
-- Native TikTok integration (critical for our target audience)
-- Instagram via Facebook Graph API
-- Built-in user management UI
-- Handles OAuth complexity
+> **Full comparison**: [AUTH-COMPARISON.md](../research/AUTH-COMPARISON.md)
+
+**Why NextAuth.js:**
+- **Native TikTok provider** (critical for our target audience)
+- **Native Instagram provider** (unique among auth solutions)
+- Open-source, no vendor lock-in
+- Zero per-user costs at any scale
+- Full control over authentication flow
+- Excellent Next.js integration
+- Battle-tested and widely used
 
 **Supported Providers:**
 | Provider | Status | Notes |
 |----------|--------|-------|
-| Facebook | ✅ Native | Full Graph API access |
-| Instagram | ✅ via FB | Requires Facebook Graph API |
-| TikTok | ✅ Native | Login + sharing |
-| Apple | ✅ Native | Required for iOS |
+| Facebook | ✅ Native | Built-in provider |
+| Instagram | ✅ Native | Built-in provider (unique to NextAuth) |
+| TikTok | ✅ Native | Built-in provider (unique to NextAuth) |
+| Apple | ✅ Native | Built-in provider |
 
-**Why NOT NextAuth:**
-- No TikTok provider
-- No Instagram provider
-- Manual OAuth setup complexity
-- More maintenance burden
+**Database for Sessions:**
+- **Vercel Postgres** for session storage
+- Using NextAuth Prisma adapter
+- Free tier sufficient for MVP (60 compute hours/mo)
+- $20/mo at scale
 
-**Why NOT Auth0:**
-- No TikTok provider
-- Higher cost ($35/mo vs $25/mo)
-- Overkill for social-only auth
+**Why NOT Clerk:**
+- Expensive at scale ($3,720/month at 250K users)
+- No native TikTok (requires custom credentials)
+- No native Instagram (workaround via Facebook)
+- Vendor lock-in
 
-**Cost**: $25/month for production
+**Why NOT Supabase Auth:**
+- No native TikTok provider
+- No native Instagram provider
+- Would require custom OAuth implementations
+
+**Why NOT Firebase Auth:**
+- No native TikTok provider
+- No native Instagram provider
+- Google vendor lock-in
+
+**Cost**: $0-$20/month (database hosting only)
+
+**Trade-off**: More implementation work upfront (~2-3 days vs hours with Clerk), but saves thousands per month at scale and gives full control.
 
 ---
 
@@ -108,29 +125,41 @@ This document captures all technology decisions for Try on Haul with rationale a
 
 ### Decision: Inngest
 
+> **Full comparison**: [BACKGROUND-JOBS-RESEARCH.md](../research/BACKGROUND-JOBS-RESEARCH.md)
+
 **Why Inngest:**
 - Serverless-native (no infrastructure)
 - Built-in retries and error handling
 - Visual execution timeline for debugging
 - Works with Vercel out-of-box
 - Step-by-step execution for complex workflows
-- Free tier (10k function runs/month)
+- **Free tier: 50K executions/month** (covers our needs)
 
 **Use Cases:**
-1. AI image generation (10-30s processing)
+1. AI image generation (60-90s processing)
 2. Notification delivery (push + email)
 3. Affiliate link batch processing
 4. Image optimization
 
 **Why NOT Trigger.dev:**
-- Requires Docker or cloud infrastructure
-- Higher cost ($20/mo)
-- More setup complexity
+- More expensive (~$77/month at our scale)
+- More complex setup
+- Can self-host, but not needed for MVP
+
+**Why NOT BullMQ/pg-boss:**
+- **Cannot run on Vercel** (need always-on worker processes)
+- Requires separate infrastructure (Railway/Render)
+- More operational complexity
+- Only saves ~$5/month vs free Inngest
 
 **Why NOT Vercel Cron:**
 - No retries
 - No observability
 - Only for scheduled tasks, not event-driven
+
+**Cost**: $0/month (free tier covers 50K executions)
+
+**Future Option**: If self-hosting becomes critical, can migrate to Trigger.dev (open-source, self-hostable) or pg-boss (requires separate worker server).
 
 ---
 
@@ -252,7 +281,7 @@ This document captures all technology decisions for Try on Haul with rationale a
 
 | Data Type | Storage Solution | Retention |
 |-----------|-----------------|-----------|
-| User sessions | Clerk (managed) | Session duration |
+| User accounts & sessions | Vercel Postgres (via NextAuth) | Indefinite |
 | Rate limits | Vercel KV | 24 hours |
 | Affiliate links | Vercel KV | Indefinite |
 | Temp images (uploads + results) | Vercel Blob | 1 hour TTL |
@@ -395,21 +424,22 @@ if (navigator.canShare?.({ files: [imageBlob] })) {
 | Service | Cost/Month |
 |---------|------------|
 | Vercel Pro | $20 |
-| Clerk Pro | $25 |
-| Inngest | Free tier |
+| Vercel Postgres | Free tier ($0) |
+| NextAuth.js | Free (open-source) |
+| Inngest | Free tier ($0) |
 | Plausible | $9 |
-| Vercel Storage | ~$5 |
+| Vercel Blob Storage | ~$5 |
 | Resend (email) | Free tier |
 | AI Generation (fal.ai) | ~$540 (9K × $0.06) |
-| **Total** | **~$599/month** |
+| **Total** | **~$574/month** |
 
 **Cost Sensitivity:**
 | MAU | Est. Generations | AI Cost | Total |
 |-----|------------------|---------|-------|
-| 1,000 | ~900 | ~$54 | ~$113 |
-| 5,000 | ~4,500 | ~$270 | ~$329 |
-| 10,000 | ~9,000 | ~$540 | ~$599 |
-| 25,000 | ~22,500 | ~$1,350 | ~$1,409 |
+| 1,000 | ~900 | ~$54 | ~$88 |
+| 5,000 | ~4,500 | ~$270 | ~$304 |
+| 10,000 | ~9,000 | ~$540 | ~$574 |
+| 25,000 | ~22,500 | ~$1,350 | ~$1,384 |
 
 > **Note**: At ~1,500 generations/month, self-hosted CatVTON becomes cost-effective. See [Cost Breakeven Analysis](../plans/IMPLEMENTATION-PLAN.md#cost-breakeven-analysis).
 
@@ -420,9 +450,10 @@ if (navigator.canShare?.({ files: [imageBlob] })) {
 | Risk | Mitigation |
 |------|------------|
 | AI model licensing | Contact authors early; have FASHN as backup |
-| Clerk pricing at scale | Can migrate to self-hosted if needed |
+| NextAuth.js complexity | Well-documented, large community, can hire Next.js devs |
 | Vercel lock-in | Standard Next.js, deployable elsewhere |
 | fal.ai reliability | Implement retry logic; have backup providers |
+| TikTok OAuth changes | NextAuth community maintains provider; can fork if needed |
 
 ---
 

@@ -51,13 +51,14 @@ Week 11-12  │ Sprint 6: QA, Partner Integration & Launch
 
 | Task | Priority | Estimate |
 |------|----------|----------|
-| Install and configure Clerk | P0 | 2h |
+| Install and configure NextAuth.js (Auth.js v5) | P0 | 2h |
+| Set up Vercel Postgres + Prisma adapter | P0 | 2h |
 | Set up Facebook OAuth | P0 | 2h |
-| Set up Instagram OAuth (via FB) | P0 | 1h |
-| Set up TikTok OAuth | P0 | 2h |
+| Set up Instagram OAuth | P0 | 2h |
+| Set up TikTok OAuth | P0 | 3h |
 | Set up Apple Sign-In | P0 | 2h |
 | Create consent modal component | P0 | 3h |
-| Implement consent storage in Clerk metadata | P0 | 2h |
+| Implement consent storage in user profile | P0 | 2h |
 | Protected route middleware | P0 | 2h |
 
 #### 1.3 UI Foundation
@@ -503,12 +504,12 @@ Implement cost tracking from Sprint 3 (see [PROVIDER-ADAPTER.md](../architecture
 
 | Dependency | Owner | Status |
 |------------|-------|--------|
-| Clerk account | Team | Pending |
+| Vercel account (Postgres, Blob, KV) | Team | Pending |
 | fal.ai account | Team | Pending |
-| Vercel account | Team | Pending |
-| Facebook App | Team | Pending |
-| TikTok App | Team | Pending |
-| Apple Developer | Team | Pending |
+| Facebook App (OAuth) | Team | Pending |
+| Instagram App (OAuth) | Team | Pending |
+| TikTok App (OAuth) | Team | Pending |
+| Apple Developer (Sign-In) | Team | Pending |
 | Plausible account | Team | Pending |
 
 ### Partner Dependencies

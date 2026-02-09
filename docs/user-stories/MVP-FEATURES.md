@@ -59,7 +59,7 @@ This document defines the MVP feature set through user stories, prioritized for 
 - [ ] User is redirected to main app after login
 - [ ] Session persists across browser refreshes
 
-**Technical Notes:** Uses Clerk for OAuth handling
+**Technical Notes:** Uses NextAuth.js (Auth.js v5) with Vercel Postgres for session storage. Native providers for TikTok and Instagram.
 
 ---
 

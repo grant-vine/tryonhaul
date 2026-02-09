@@ -75,7 +75,7 @@ We're not just a utility. We're a **content creation engine**. Every try-on is d
 | Component | Technology |
 |-----------|------------|
 | Frontend | Next.js 16 (PWA) |
-| Auth | Clerk (FB, IG, TikTok, Apple) |
+| Auth | NextAuth.js (FB, IG, TikTok, Apple) |
 | AI | fal.ai (CatVTON) + FASHN backup |
 | Background Jobs | Inngest |
 | Hosting | Vercel |

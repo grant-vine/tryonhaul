@@ -26,7 +26,7 @@ This document describes how data flows through Try on Haul and how external serv
 │       │                  │               └──────────┘                      │
 │       │                  ▼                    │                            │
 │       │             ┌──────────┐              │                            │
-│       │             │ Clerk    │◀─────────────┘ (save consent)             │
+│       │             │ NextAuth │◀─────────────┘ (save consent)             │
 │       │             │ Session  │                                           │
 │       │             └──────────┘                                           │
 │       │                                                                    │
@@ -74,7 +74,7 @@ This document describes how data flows through Try on Haul and how external serv
 
 ## Integration Details
 
-### 1. Authentication (Clerk)
+### 1. Authentication (NextAuth.js)
 
 **Flow:**
 ```
@@ -84,7 +84,10 @@ User ──▶ "Login with Facebook" ──▶ Facebook OAuth
                               Facebook returns token
                                        │
                                        ▼
-                              Clerk validates + creates session
+                              NextAuth.js validates + creates session
+                                       │
+                                       ▼
+                              Store session in Vercel Postgres
                                        │
                                        ▼
                               Return session cookie to client
@@ -93,14 +96,14 @@ User ──▶ "Login with Facebook" ──▶ Facebook OAuth
 **Data Exchanged:**
 | From | To | Data |
 |------|-----|------|
-| Facebook | Clerk | User ID, email, name, profile photo |
-| Clerk | Our App | Session token, user object |
-| Our App | Clerk | Consent status (custom claim) |
+| Facebook | NextAuth.js | User ID, email, name, profile photo |
+| NextAuth.js | Our App | Session token, user object |
+| Our App | Postgres | Consent status (user profile field) |
 
 **API Endpoints:**
-- `POST /api/auth/callback/:provider` - OAuth callback
+- `GET/POST /api/auth/[...nextauth]` - NextAuth.js handlers
 - `GET /api/auth/session` - Get current session
-- `DELETE /api/auth/session` - Logout
+- `POST /api/auth/signout` - Logout
 
 ---
 
@@ -376,7 +379,6 @@ API Request ──▶ Get user ID from session
 | Endpoint | Source | Purpose |
 |----------|--------|---------|
 | `/api/webhooks/fal` | fal.ai | Generation completion |
-| `/api/webhooks/clerk` | Clerk | User events (delete, etc.) |
 | `/api/webhooks/partner` | Partner stores | Conversion tracking |
 
 ---
@@ -393,7 +395,7 @@ API Request ──▶ Get user ID from session
 │  USER DATA                                                                  │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
 │  │ Collected: Email, name, profile photo (from social auth)            │  │
-│  │ Stored: Clerk (managed service, SOC2 compliant)                     │  │
+│  │ Stored: Vercel Postgres (via NextAuth.js)                           │  │
 │  │ Retention: Until user deletes account                               │  │
 │  │ Access: User can export/delete via settings                         │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
@@ -429,8 +431,8 @@ API Request ──▶ Get user ID from session
 
 ### CCPA Compliance Points
 
-1. **Right to Know**: User can see what data we have via Clerk dashboard
-2. **Right to Delete**: User can delete account; all data removed
+1. **Right to Know**: User can see what data we have via account settings
+2. **Right to Delete**: User can delete account; all data removed from Postgres
 3. **Right to Opt-Out**: No data selling; analytics are anonymized
 4. **Non-Discrimination**: No service differences based on privacy choices
 

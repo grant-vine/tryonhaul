@@ -231,14 +231,14 @@ This document provides detailed functional and non-functional requirements for T
 
 | Field | Type | Required | Storage |
 |-------|------|----------|---------|
-| userId | string | Yes | Clerk |
-| email | string | Yes | Clerk |
-| name | string | Yes | Clerk |
-| profilePhoto | URL | No | Clerk |
-| authProvider | enum | Yes | Clerk |
-| consentGiven | boolean | Yes | Clerk metadata |
-| consentDate | datetime | Yes | Clerk metadata |
-| createdAt | datetime | Yes | Clerk |
+| userId | string | Yes | Vercel Postgres |
+| email | string | Yes | Vercel Postgres |
+| name | string | Yes | Vercel Postgres |
+| profilePhoto | URL | No | Vercel Postgres |
+| authProvider | enum | Yes | Vercel Postgres |
+| consentGiven | boolean | Yes | Vercel Postgres |
+| consentDate | datetime | Yes | Vercel Postgres |
+| createdAt | datetime | Yes | Vercel Postgres |
 
 ### DR-2: Generation Job
 
@@ -282,7 +282,7 @@ This document provides detailed functional and non-functional requirements for T
 
 | Service | Expected Uptime | Fallback |
 |---------|-----------------|----------|
-| Clerk (Auth) | 99.9% | Cached sessions |
+| Vercel Postgres (Auth) | 99.9% | Cached sessions |
 | fal.ai (AI) | 99% | IDM-VTON or FASHN |
 | Vercel (Hosting) | 99.99% | None (primary) |
 | Vercel KV | 99.9% | Redis fallback |

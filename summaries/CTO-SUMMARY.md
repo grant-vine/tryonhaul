@@ -31,10 +31,11 @@ Landing → Social Login → Consent Modal → Upload Selfie → Add Outfit → 
 |-----------|--------|-----|--------------|
 | **Frontend** | Next.js 16 (PWA) | Best Vercel integration, React ecosystem | - |
 | **Hosting** | Vercel Pro | Zero-config, edge functions, built-in storage | $20 |
-| **Auth** | Clerk | Only option with FB + IG + TikTok + Apple | $25 |
+| **Auth** | NextAuth.js (Auth.js v5) | Only option with native FB + IG + TikTok + Apple, open-source | Free |
+| **Auth Database** | Vercel Postgres | Session storage, user accounts | Free tier |
 | **AI Generation** | fal.ai (CatVTON) | Best face preservation, $0.06/image | Variable |
 | **AI Backup** | FASHN API | Commercial license, scene support, $0.075/image | Fallback |
-| **Background Jobs** | Inngest | Serverless, free tier, great DX | Free |
+| **Background Jobs** | Inngest | Serverless, 50K/month free, great DX | Free |
 | **Ephemeral Storage** | Vercel Blob | 1h TTL, automatic cleanup | ~$5 |
 | **Rate Limiting** | Vercel KV | Simple, integrated | Included |
 | **Push Notifications** | Web Push API | Free, native | Free |
@@ -47,10 +48,10 @@ Landing → Social Login → Consent Modal → Upload Selfie → Add Outfit → 
 
 | Scale (MAU) | Est. Generations/mo | AI Cost | Total Monthly |
 |-------------|---------------------|---------|---------------|
-| **1,000** | ~900 | ~$54 | **~$113** |
-| **5,000** | ~4,500 | ~$270 | **~$329** |
-| **10,000** | ~9,000 | ~$540 | **~$599** |
-| **25,000** | ~22,500 | ~$1,350 | **~$1,409** |
+| **1,000** | ~900 | ~$54 | **~$88** |
+| **5,000** | ~4,500 | ~$270 | **~$304** |
+| **10,000** | ~9,000 | ~$540 | **~$574** |
+| **25,000** | ~22,500 | ~$1,350 | **~$1,384** |
 
 **Breakeven Point:** Self-hosted CatVTON becomes cost-effective at ~1,500 generations/month.
 
@@ -90,8 +91,8 @@ Landing → Social Login → Consent Modal → Upload Selfie → Add Outfit → 
 ├─────────────────────────────────────────────────────────────────┤
 │  Next.js PWA  →  API Routes  →  Inngest  →  AI Provider        │
 │       ↓              ↓             ↓           Adapter          │
-│  Clerk Auth    Vercel KV      Background    ┌─────────────┐    │
-│                (rate limit)      Jobs       │ fal.ai      │    │
+│  NextAuth.js   Vercel KV      Background    ┌─────────────┐    │
+│  (Postgres)    (rate limit)      Jobs       │ fal.ai      │    │
 │                                             │ FASHN       │    │
 │  Vercel Blob (ephemeral 1h TTL)             │ Self-hosted │    │
 └─────────────────────────────────────────────┴─────────────┴────┘
