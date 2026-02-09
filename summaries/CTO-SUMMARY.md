@@ -44,16 +44,38 @@ Landing → Social Login → Consent Modal → Upload Selfie → Add Outfit → 
 
 ---
 
-## Cost Projections
+## Cost Projections (5-Tier Viral Scaling)
 
-| Scale (MAU) | Est. Generations/mo | AI Cost | Total Monthly |
-|-------------|---------------------|---------|---------------|
-| **1,000** | ~900 | ~$54 | **~$88** |
-| **5,000** | ~4,500 | ~$270 | **~$304** |
-| **10,000** | ~9,000 | ~$540 | **~$574** |
-| **25,000** | ~22,500 | ~$1,350 | **~$1,384** |
+> **Full analysis**: [VIRAL-SCALE-PRICING.md](../docs/plans/VIRAL-SCALE-PRICING.md)
 
-**Breakeven Point:** Self-hosted CatVTON becomes cost-effective at ~1,500 generations/month.
+**With fal.ai (API-based):**
+
+| MAU | Generations/mo | AI Cost | Total Monthly |
+|-----|----------------|---------|---------------|
+| **1,000** | 900 | $151 | **$180/mo** |
+| **10,000** | 9,000 | $1,512 | **$1,577/mo** |
+| **100,000** | 90,000 | $15,120 | **$15,344/mo** |
+| **1,000,000** | 900,000 | $151,200 | **$153,133/mo** |
+| **10,000,000** | 9,000,000 | $1,512,000 | **$1,533,518/mo** |
+
+**With Self-Hosted GPUs:**
+
+| MAU | Self-Hosted Cost | Monthly Savings vs fal.ai |
+|-----|------------------|---------------------------|
+| **10,000** | $100/mo | $1,477/mo (94% savings) |
+| **100,000** | $574/mo | $14,770/mo (96% savings) |
+| **1,000,000** | $7,908/mo | **$145,225/mo (95% savings)** |
+| **10,000,000** | $53,718/mo | **$1,479,800/mo (96% savings)** |
+
+**Critical Insight**: AI generation = 95%+ of total cost. Self-hosting ROI-positive at ~10K MAU.
+
+**Infrastructure Triggers:**
+| MAU | Action |
+|-----|--------|
+| 10K | Evaluate self-hosting ROI |
+| 50K | Begin migration planning |
+| 100K | Self-hosting critical (saves $15K/mo) |
+| 1M | Must self-host (saves $145K/mo) |
 
 ---
 
@@ -127,5 +149,8 @@ Landing → Social Login → Consent Modal → Upload Selfie → Add Outfit → 
 - [Full Technical Documentation](../INDEX.md)
 - [Architecture Overview](../docs/architecture/OVERVIEW.md)
 - [Tech Stack Decisions](../docs/architecture/TECH-STACK.md)
+- [Analytics & Tracking](../docs/architecture/ANALYTICS-TRACKING.md)
+- [Viral Scale Pricing](../docs/plans/VIRAL-SCALE-PRICING.md)
 - [Implementation Plan](../docs/plans/IMPLEMENTATION-PLAN.md)
 - [AI Models Research](../docs/research/AI-MODELS.md)
+- [Auth Comparison](../docs/research/AUTH-COMPARISON.md)

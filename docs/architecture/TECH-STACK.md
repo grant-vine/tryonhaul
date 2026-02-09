@@ -22,7 +22,7 @@ This document captures all technology decisions for Try on Haul with rationale a
 | AI Generation | CatVTON via fal.ai | IDM-VTON, FASHN API |
 | Hosting | Vercel | Netlify, Cloudflare |
 | Image Processing | next/image + Sharp | Cloudinary, Imgix |
-| Analytics | Plausible | PostHog, Google Analytics |
+| Analytics | Vercel Web Analytics | PostHog, Google Analytics, Plausible |
 | Database | Vercel Postgres | Supabase, PlanetScale |
 
 ---
@@ -319,27 +319,38 @@ This document captures all technology decisions for Try on Haul with rationale a
 
 ## 9. Analytics & Tracking
 
-### Decision: Plausible + Custom Affiliate Tracking
+> **Full Architecture**: [ANALYTICS-TRACKING.md](./ANALYTICS-TRACKING.md)
 
-**Why Plausible:**
-- GDPR/CCPA friendly (no cookie banner needed)
+### Decision: Vercel Web Analytics + Custom Affiliate Tracking
+
+**Why Vercel Web Analytics:**
+- Included with Vercel Pro ($0 additional)
+- Privacy-friendly (no cookie banner needed)
+- Core Web Vitals tracking
 - Simple, focused metrics
-- Goals and conversion tracking
-- $9/month
+- Scales with Vercel plan ($150/mo at 1M events)
 
 **Custom Affiliate Tracking:**
 - URL shortener via Vercel Edge Functions
 - Click tracking in Vercel KV
 - Attribution via UTM parameters
+- Revenue tracking via partner webhooks
 
 **Metrics to Track:**
 | Metric | Tool |
 |--------|------|
-| Page views, sessions | Plausible |
-| User flows | Plausible Goals |
-| Affiliate clicks | Custom + Plausible |
+| Page views, sessions | Vercel Web Analytics |
+| User flows | Custom events |
+| Affiliate clicks | Custom + KV |
 | Conversion (sales) | Partner webhooks |
 | Generation success rate | Internal logging |
+
+**Cost at Scale:**
+| MAU | Vercel Analytics | Custom Tracking |
+|-----|------------------|-----------------|
+| 1K-100K | Free (included) | Free (KV included) |
+| 1M | $150/mo | ~$50/mo (KV) |
+| 10M | $1,500/mo | ~$500/mo (KV) |
 
 ---
 
@@ -415,11 +426,11 @@ if (navigator.canShare?.({ files: [imageBlob] })) {
 
 ## Cost Estimate (MVP)
 
-**Assumptions for 10,000 MAU:**
-- Average user generates 1.5 try-ons per session
-- Average user has 2 sessions per month
-- Active generation users: ~30% of MAU = 3,000
-- Generations per month: 3,000 × 3 = ~9,000
+> **Full 5-tier analysis**: [VIRAL-SCALE-PRICING.md](../plans/VIRAL-SCALE-PRICING.md)
+
+**Assumptions:**
+- Average user generates 3 try-ons per month (30% active rate)
+- Generations per month: MAU × 30% × 3 = ~0.9 × MAU
 
 | Service | Cost/Month |
 |---------|------------|
@@ -427,21 +438,35 @@ if (navigator.canShare?.({ files: [imageBlob] })) {
 | Vercel Postgres | Free tier ($0) |
 | NextAuth.js | Free (open-source) |
 | Inngest | Free tier ($0) |
-| Plausible | $9 |
+| Vercel Web Analytics | Free (included) |
 | Vercel Blob Storage | ~$5 |
 | Resend (email) | Free tier |
-| AI Generation (fal.ai) | ~$540 (9K × $0.06) |
-| **Total** | **~$574/month** |
+| AI Generation (fal.ai) | Variable (see below) |
 
-**Cost Sensitivity:**
-| MAU | Est. Generations | AI Cost | Total |
-|-----|------------------|---------|-------|
-| 1,000 | ~900 | ~$54 | ~$88 |
-| 5,000 | ~4,500 | ~$270 | ~$304 |
-| 10,000 | ~9,000 | ~$540 | ~$574 |
-| 25,000 | ~22,500 | ~$1,350 | ~$1,384 |
+**5-Tier Cost Projections:**
 
-> **Note**: At ~1,500 generations/month, self-hosted CatVTON becomes cost-effective. See [Cost Breakeven Analysis](../plans/IMPLEMENTATION-PLAN.md#cost-breakeven-analysis).
+| MAU | Generations/mo | AI Cost (fal.ai) | Infrastructure | Total |
+|-----|----------------|------------------|----------------|-------|
+| **1,000** | 900 | $151 | $29 | **$180/mo** |
+| **10,000** | 9,000 | $1,512 | $65 | **$1,577/mo** |
+| **100,000** | 90,000 | $15,120 | $224 | **$15,344/mo** |
+| **1,000,000** | 900,000 | $151,200 | $1,933 | **$153,133/mo** |
+| **10,000,000** | 9,000,000 | $1,512,000 | $21,518 | **$1,533,518/mo** |
+
+**Self-Hosting Breakeven:**
+
+| MAU | fal.ai Cost | Self-Hosted Cost | Monthly Savings | ROI |
+|-----|-------------|------------------|-----------------|-----|
+| 10K | $1,577/mo | $100/mo | $1,477/mo | 94% |
+| 100K | $15,344/mo | $574/mo | $14,770/mo | 96% |
+| 1M | $153,133/mo | $7,908/mo | $145,225/mo | **95%** |
+
+**Critical Insight**: AI generation is 95%+ of costs. Self-hosting becomes ROI-positive at ~10K MAU.
+
+> **Trigger Points:**
+> - **10K MAU**: Begin self-hosting evaluation
+> - **50K MAU**: Start migration planning
+> - **100K MAU**: Self-hosting critical (saves $15K/mo)
 
 ---
 

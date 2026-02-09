@@ -18,7 +18,11 @@
 | [Requirements](./docs/user-stories/REQUIREMENTS.md) | Detailed functional requirements | Active |
 | [AI Models Research](./docs/research/AI-MODELS.md) | Virtual try-on AI model analysis | Active |
 | [Prompt Engineering](./docs/research/PROMPT-ENGINEERING.md) | Prompting strategies for try-on | Active |
+| [Auth Comparison](./docs/research/AUTH-COMPARISON.md) | Authentication provider analysis | Active |
+| [Background Jobs Research](./docs/research/BACKGROUND-JOBS-RESEARCH.md) | Job queue solution comparison | Active |
+| [Analytics & Tracking](./docs/architecture/ANALYTICS-TRACKING.md) | Analytics, affiliates, attribution | Active |
 | [Implementation Plan](./docs/plans/IMPLEMENTATION-PLAN.md) | Phased development roadmap | Active |
+| [Viral Scale Pricing](./docs/plans/VIRAL-SCALE-PRICING.md) | 5-tier cost projections (1K-10M MAU) | Active |
 
 ## Standards & Guidelines
 
@@ -85,6 +89,7 @@ INDEX.md (this file)
 |       +-- PROVIDER-ADAPTER.md (AI provider abstraction)
 |       +-- SHARING-STRATEGY.md (social sharing implementation)
 |       +-- DATA-FLOW.md (integrations, APIs)
+    |       +-- ANALYTICS-TRACKING.md (analytics, affiliates, attribution)
     |
     +-- docs/user-stories/
     |       +-- MVP-FEATURES.md (user stories)
@@ -93,6 +98,8 @@ INDEX.md (this file)
     +-- docs/research/
     |       +-- AI-MODELS.md (model comparison)
     |       +-- PROMPT-ENGINEERING.md (prompting strategies)
+    |       +-- AUTH-COMPARISON.md (auth provider analysis)
+    |       +-- BACKGROUND-JOBS-RESEARCH.md (job queue comparison)
     |
     +-- docs/standards/
     |       +-- DEV-STANDARDS.md
@@ -101,6 +108,7 @@ INDEX.md (this file)
     |
     +-- docs/plans/
             +-- IMPLEMENTATION-PLAN.md (phased roadmap)
+            +-- VIRAL-SCALE-PRICING.md (5-tier cost projections)
 ```
 
 ---
